@@ -86,7 +86,7 @@ bool USB_COMM::inputHandler(String strObjInput) {
                       // For now, this should always be 0
                       _setTemp3 = tempInt;
                       if (_setTemp3 != 0) {
-                        _exitCode = 2;
+                        _exitCode = 3;
                         Serial.println(generateTransmissionString(2));
                         _opCode = 0;
                         return false;
@@ -104,7 +104,6 @@ bool USB_COMM::inputHandler(String strObjInput) {
 int USB_COMM::getTemp1() {
     return _realTemp1;
 }
-
 
 int USB_COMM::getTemp2() {
     return _realTemp2;
