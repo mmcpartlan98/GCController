@@ -50,11 +50,15 @@ bool USB_COMM::inputHandler(String strObjInput) {
             if (((int) inputString[i] < (int) '0' || ((int) inputString[i] > (int) '9')) && (int) inputString[i] > (int) ' ') {
                 // SPACES ARE NOT INTS
                 _exitCode = 1;
+                Serial.println(generateTransmissionString(2));
+                _exitCode = 0;
                 return false;
             }
         }
         if (spaceCounter != 3) {
             _exitCode = 2;
+            Serial.println(generateTransmissionString(2));
+            _exitCode = 0;
             return false;
         } else {
             int convert[3] = { 0, 0, 0 };
@@ -88,7 +92,7 @@ bool USB_COMM::inputHandler(String strObjInput) {
                       if (_setTemp3 != 0) {
                         _exitCode = 3;
                         Serial.println(generateTransmissionString(2));
-                        _opCode = 0;
+                        _exitCode = 0;
                         return false;
                       }
                     }
