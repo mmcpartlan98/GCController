@@ -17,7 +17,6 @@ unsigned long ISRDelay2 = maxDelay;
 unsigned long ZCPeakOffset = 0;
 volatile unsigned long lastZC = 0;
 volatile int interruptCounter = 0;
-volatile int shouldTrigger = 0;
 
 int setTemp1;
 int setTemp2;
@@ -28,7 +27,6 @@ USB_COMM thermalCont(9600);
 
 void recordZC() {
   lastZC = micros();
-  shouldTrigger = 1;
 }
 
 void setup() {
@@ -64,18 +62,15 @@ void setup() {
 void loop() {
   // Tell comm manager to look for message and update set temps if found
   thermalCont.checkForMsg();
-  
-  if (shouldTrigger == 1) {
-    if (lastZC + ISRDelay1 + ZCPeakOffset <= micros()) {
-      digitalWrite(TRIAC1, HIGH);
-    }
-    if (lastZC + ISRDelay2 + ZCPeakOffset <= micros()) {
-      digitalWrite(TRIAC2, HIGH);
-    }
-    digitalWrite(TRIAC1, LOW);
-    digitalWrite(TRIAC2, LOW);
-    shouldTrigger = 0;
+
+  if (lastZC + ISRDelay1 + ZCPeakOffset <= micros()) {
+    digitalWrite(TRIAC1, HIGH);
   }
+  if (lastZC + ISRDelay2 + ZCPeakOffset <= micros()) {
+    digitalWrite(TRIAC2, HIGH);
+  }
+  digitalWrite(TRIAC1, LOW);
+  digitalWrite(TRIAC2, LOW);
 
   interruptCounter += 1;
   if (interruptCounter >= 20000) {
@@ -88,14 +83,14 @@ void loop() {
     digitalWrite(THERM3, LOW);
     int thermalSPI3 = ((uint16_t)SPI.transfer16(blankSend) & digitMask) >> 5;
     digitalWrite(THERM3, HIGH);
-    
+
     // Tell the communication manager what the temps are...
     thermalCont.setRealTemps(thermalSPI1, thermalSPI2, thermalSPI3);
 
     // Refresh temperatures set by raspberry pi
     setTemp1 = thermalCont.getSetTemp1();
     setTemp2 = thermalCont.getSetTemp2();
-    
+
     int lookupTableIndex1 = round(((double)thermalSPI1 / (double)setTemp1) * 100);
     int lookupTableIndex2 = round(((double)thermalSPI2 / (double)setTemp2) * 100);
 
@@ -110,5 +105,6 @@ void loop() {
     } else {
       ISRDelay2 = maxDelay * tempDelayTable[lookupTableIndex2];
     }
+    interruptCounter = 0;
   }
 }
