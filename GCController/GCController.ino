@@ -19,8 +19,8 @@ volatile unsigned long lastZC = 0;
 volatile int interruptCounter = 0;
 volatile int shouldTrigger = 0;
 
-int setTemp1 = 50;
-int setTemp2 = 100;
+int setTemp1;
+int setTemp2;
 
 double tempDelayTable[101];
 
@@ -91,6 +91,10 @@ void loop() {
     
     // Tell the communication manager what the temps are...
     thermalCont.setRealTemps(thermalSPI1, thermalSPI2, thermalSPI3);
+
+    // Refresh temperatures set by raspberry pi
+    setTemp1 = thermalCont.getSetTemp1();
+    setTemp2 = thermalCont.getSetTemp2();
     
     int lookupTableIndex1 = round(((double)thermalSPI1 / (double)setTemp1) * 100);
     int lookupTableIndex2 = round(((double)thermalSPI2 / (double)setTemp2) * 100);

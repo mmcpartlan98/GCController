@@ -31,13 +31,6 @@ public:
     void setRealTemps(int set1, int set2, int set3);
     void setDesiredTemps(int set1, int set2, int set3);
 private:
-    // Pin assignments
-    int _SCLK;
-    int _MISO;
-    int _THERM1;
-    int _THERM2;
-    int _THERM3;
-
     // Temperature storage
     int _setTemp1 = 0;
     int _setTemp2 = 0;
@@ -55,7 +48,7 @@ private:
       // 002 - Error
       //         Arduino will return error if unable to execute raspberry pi commands (usually overtemperature protection)
     int _opCode = 0;
-    int _exitCode = -1;
+    int _exitCode = 0;
 };
 
 #endif

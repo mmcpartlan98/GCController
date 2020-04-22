@@ -41,7 +41,6 @@ bool USB_COMM::inputHandler(String strObjInput) {
         _exitCode = 2;
         return false;
     } else {
-        Serial.println(inputString);
         int spaceCounter = 0;
         for (int i = 0; i < 15; i++) {
           // Look for spaces (ASCII #32)
@@ -68,11 +67,8 @@ bool USB_COMM::inputHandler(String strObjInput) {
             _opCode = convert[0] * 100 + convert[1] * 10 + convert[2];
 
             // Read temp arguments
-            convert[0] = 0;
-            convert[1] = 0;
-            convert[2] = 0;
             int tempArrayIndex = 0;
-            for (int i = 5; i < 15; i += 4) {
+            for (int i = 4; i < 15; i += 4) {
                 convert[0] = inputString[i] - '0';
                 convert[1] = inputString[i + 1] - '0';
                 convert[2] = inputString[i + 2] - '0';
@@ -89,8 +85,10 @@ bool USB_COMM::inputHandler(String strObjInput) {
                       case 2:
                       // For now, this should always be 0
                       _setTemp3 = tempInt;
-                      if (_setTemp3 == 0) {
+                      if (_setTemp3 != 0) {
                         _exitCode = 2;
+                        Serial.println(generateTransmissionString(2));
+                        _opCode = 0;
                         return false;
                       }
                     }
@@ -159,7 +157,6 @@ String USB_COMM::to3String(double number) {
   char hundreds = char((floor(number / 100.0) + 48));
   char tens = char((floor(number / 10.0) - ((hundreds - 48) * 10) + 48));
   char ones = char((number - ((hundreds - 48) * 100) - ((tens - 48) * 10) + 48));
-  Serial.println((floor(number / 10.0) - ((hundreds - 48) * 10) + 48));
   String output = "";
   output = output + hundreds + tens + ones;
   return output;
@@ -185,9 +182,9 @@ String USB_COMM::generateTransmissionString(int opCode) {
         break;
       case 2:
         opCodeS = "002";
-        arg1S = "000";
-        arg2S = "000";
-        arg3S = "000";
+        arg1S = to3String(_exitCode);
+        arg2S = "***";
+        arg3S = "***";
     }
     String retStr = opCodeS + " " + arg1S + " " + arg2S + " " + arg3S;
     return retStr;
