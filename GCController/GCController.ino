@@ -41,7 +41,6 @@ void setup() {
   digitalWrite(THERM2, HIGH);
   digitalWrite(THERM3, HIGH);
 
-  Serial.begin(115200);
   SPI.begin();
   SPI.beginTransaction(SPISettings(400000, MSBFIRST, SPI_MODE1));
   delay(1000);
